@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -63,9 +64,13 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         // 4. (Optional) Extract user info and forward to downstream services
+
+        // 4. Extract user info and forward to downstream services
         String username = jwtUtil.extractUsername(token);
+        Long userId = jwtUtil.extractUserId(token);
         exchange = exchange.mutate()
                 .request(r -> r.header("X-User-Id", username)
+                        .header("X-User-Id", String.valueOf(userId))
                         .header("X-User-Roles", String.join(",", jwtUtil.extractRoles(token))))
                 .build();
 

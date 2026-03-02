@@ -50,6 +50,13 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!--Swagger dependenct for webflux case-->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+
         <!-- Resilience4J for Circuit Breaker -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

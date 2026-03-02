@@ -20,7 +20,11 @@ spring:
 
     gateway:
       routes:
-        # PUBLIC ROUTES (MUST come first - more specific)
+
+        # ===============================
+        # PUBLIC ROUTES
+        # ===============================
+
         - id: platform-public
           uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
@@ -35,24 +39,6 @@ spring:
           predicates:
             - Path=/api/platform/auth/**
           filters:
-            - StripPrefix=1  # Removes /api ? /auth/**
-          metadata:
-            is-public: true
-
-        - id: platform-swagger
-          uri: lb://MOMENT-FOREVER-PLATFORM
-          predicates:
-            - Path=/api/swagger-ui.html
-          filters:
-            - StripPrefix=1
-          metadata:
-            is-public: true
-
-        - id: platform-api-docs
-          uri: lb://MOMENT-FOREVER-PLATFORM
-          predicates:
-            - Path=/api/v3/api-docs
-          filters:
             - StripPrefix=1
           metadata:
             is-public: true
@@ -62,14 +48,15 @@ spring:
           predicates:
             - Path=/api/uploads/**
           filters:
-            - StripPrefix=1  # Removes /api ? /uploads/**
+            - StripPrefix=1
           metadata:
             is-public: true
 
-        - id: booking-swagger
-          uri: lb://MOMENT-FOREVER-BOOKING
+        # Swagger API Docs (IMPORTANT - must allow /**)
+        - id: platform-api-docs
+          uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
-            - Path=/api/booking-swagger.html
+            - Path=/api/platform/v3/api-docs/**
           filters:
             - StripPrefix=1
           metadata:
@@ -78,16 +65,17 @@ spring:
         - id: booking-api-docs
           uri: lb://MOMENT-FOREVER-BOOKING
           predicates:
-            - Path=/api/booking-api-docs
+            - Path=/api/booking/v3/api-docs/**
           filters:
             - StripPrefix=1
           metadata:
             is-public: true
 
+        # Health Checks
         - id: platform-actuator-health
           uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
-            - Path=/api/actuator/health
+            - Path=/api/platform/actuator/health
           filters:
             - StripPrefix=1
           metadata:
@@ -98,17 +86,19 @@ spring:
           predicates:
             - Path=/api/booking/actuator/health
           filters:
-            - StripPrefix=1  # Removes /api/booking ? /actuator/health
+            - StripPrefix=1
           metadata:
             is-public: true
 
-        # PROTECTED ROUTES (more general, come after public)
+        # ===============================
+        # PROTECTED ROUTES
+        # ===============================
+
         - id: platform-admin
           uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
             - Path=/api/platform/admin/**
           filters:
-
             - StripPrefix=1
           metadata:
             requires-auth: true
@@ -118,7 +108,6 @@ spring:
           predicates:
             - Path=/api/platform/user/**
           filters:
-
             - StripPrefix=1
           metadata:
             requires-auth: true
@@ -128,8 +117,7 @@ spring:
           predicates:
             - Path=/api/platform/**
           filters:
-
-            - StripPrefix=1  # Removes /api ? /platform/**
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
@@ -138,17 +126,15 @@ spring:
           predicates:
             - Path=/api/booking/**
           filters:
-
-            - StripPrefix=1  # Removes /api ? /booking/**
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
         - id: platform-actuator
           uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
-            - Path=/api/actuator/**
+            - Path=/api/platform/actuator/**
           filters:
-            # Protected (except health, which is handled above)
             - StripPrefix=1
           metadata:
             requires-auth: true
@@ -158,17 +144,39 @@ spring:
           predicates:
             - Path=/api/booking/actuator/**
           filters:
-            # Protected (except health)
             - StripPrefix=1
           metadata:
             requires-auth: true
 
-# JWT configuration
+
+# ===============================
+# JWT CONFIG
+# ===============================
+
 jwt:
   secret: "your-256-bit-secret-key-must-be-at-least-32-characters-long-here"
   expiration: 86400000
+
+
+# ===============================
+# LOGGING
+# ===============================
 
 logging:
   level:
     com.example.gateway: DEBUG
     org.springframework.cloud.gateway: INFO
+
+
+# ===============================
+# SWAGGER AGGREGATION (GATEWAY)
+# ===============================
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Platform Service
+        url: /api/platform/v3/api-docs
+      - name: Booking Service
+        url: /api/booking/v3/api-docs
