@@ -1,0 +1,174 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        service-name: ${spring.application.name}
+        instance-id: ${spring.application.name}:${random.value}
+        prefer-ip-address: true
+      config:
+        enabled: false  # Disable Consul Config
+
+    gateway:
+      routes:
+        # PUBLIC ROUTES (MUST come first - more specific)
+        - id: platform-public
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/platform/public/**
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
+        - id: platform-auth
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/platform/auth/**
+          filters:
+            - StripPrefix=1  # Removes /api ? /auth/**
+          metadata:
+            is-public: true
+
+        - id: platform-swagger
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/swagger-ui.html
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
+        - id: platform-api-docs
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/v3/api-docs
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
+        - id: platform-uploads
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/uploads/**
+          filters:
+            - StripPrefix=1  # Removes /api ? /uploads/**
+          metadata:
+            is-public: true
+
+        - id: booking-swagger
+          uri: lb://MOMENT-FOREVER-BOOKING
+          predicates:
+            - Path=/api/booking-swagger.html
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
+        - id: booking-api-docs
+          uri: lb://MOMENT-FOREVER-BOOKING
+          predicates:
+            - Path=/api/booking-api-docs
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
+        - id: platform-actuator-health
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/actuator/health
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
+        - id: booking-actuator-health
+          uri: lb://MOMENT-FOREVER-BOOKING
+          predicates:
+            - Path=/api/booking/actuator/health
+          filters:
+            - StripPrefix=1  # Removes /api/booking ? /actuator/health
+          metadata:
+            is-public: true
+
+        # PROTECTED ROUTES (more general, come after public)
+        - id: platform-admin
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/platform/admin/**
+          filters:
+
+            - StripPrefix=1
+          metadata:
+            requires-auth: true
+
+        - id: platform-user
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/platform/user/**
+          filters:
+
+            - StripPrefix=1
+          metadata:
+            requires-auth: true
+
+        - id: platform-other
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/platform/**
+          filters:
+
+            - StripPrefix=1  # Removes /api ? /platform/**
+          metadata:
+            requires-auth: true
+
+        - id: booking-service
+          uri: lb://MOMENT-FOREVER-BOOKING
+          predicates:
+            - Path=/api/booking/**
+          filters:
+
+            - StripPrefix=1  # Removes /api ? /booking/**
+          metadata:
+            requires-auth: true
+
+        - id: platform-actuator
+          uri: lb://MOMENT-FOREVER-PLATFORM
+          predicates:
+            - Path=/api/actuator/**
+          filters:
+            # Protected (except health, which is handled above)
+            - StripPrefix=1
+          metadata:
+            requires-auth: true
+
+        - id: booking-actuator
+          uri: lb://MOMENT-FOREVER-BOOKING
+          predicates:
+            - Path=/api/booking/actuator/**
+          filters:
+            # Protected (except health)
+            - StripPrefix=1
+          metadata:
+            requires-auth: true
+
+# JWT configuration
+jwt:
+  secret: "your-256-bit-secret-key-must-be-at-least-32-characters-long-here"
+  expiration: 86400000
+
+logging:
+  level:
+    com.example.gateway: DEBUG
+    org.springframework.cloud.gateway: INFO
