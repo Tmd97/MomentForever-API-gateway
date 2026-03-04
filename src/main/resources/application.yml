@@ -15,6 +15,8 @@ spring:
         service-name: ${spring.application.name}
         instance-id: ${spring.application.name}:${random.value}
         prefer-ip-address: true
+        health-check-path: /actuator/health
+        health-check-interval: 10s
       config:
         enabled: false  # Disable Consul Config
 
@@ -30,7 +32,7 @@ spring:
           predicates:
             - Path=/api/platform/public/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             is-public: true
 
@@ -39,7 +41,7 @@ spring:
           predicates:
             - Path=/api/platform/auth/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             is-public: true
 
@@ -52,13 +54,13 @@ spring:
           metadata:
             is-public: true
 
-        # Swagger API Docs (IMPORTANT - must allow /**)
+        # Swagger API Docs
         - id: platform-api-docs
           uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
             - Path=/api/platform/v3/api-docs/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             is-public: true
 
@@ -67,17 +69,17 @@ spring:
           predicates:
             - Path=/api/booking/v3/api-docs/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             is-public: true
 
-        # Health Checks
+        # Health Checks (public, no auth)
         - id: platform-actuator-health
           uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
             - Path=/api/platform/actuator/health
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             is-public: true
 
@@ -86,7 +88,7 @@ spring:
           predicates:
             - Path=/api/booking/actuator/health
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             is-public: true
 
@@ -99,7 +101,7 @@ spring:
           predicates:
             - Path=/api/platform/admin/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             requires-auth: true
 
@@ -108,7 +110,7 @@ spring:
           predicates:
             - Path=/api/platform/user/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             requires-auth: true
 
@@ -117,7 +119,7 @@ spring:
           predicates:
             - Path=/api/platform/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             requires-auth: true
 
@@ -126,7 +128,7 @@ spring:
           predicates:
             - Path=/api/booking/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             requires-auth: true
 
@@ -135,7 +137,7 @@ spring:
           predicates:
             - Path=/api/platform/actuator/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             requires-auth: true
 
@@ -144,7 +146,7 @@ spring:
           predicates:
             - Path=/api/booking/actuator/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
           metadata:
             requires-auth: true
 
@@ -156,6 +158,20 @@ spring:
 jwt:
   secret: "your-256-bit-secret-key-must-be-at-least-32-characters-long-here"
   expiration: 86400000
+
+
+# ===============================
+# MANAGEMENT / ACTUATOR
+# ===============================
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
 
 
 # ===============================
