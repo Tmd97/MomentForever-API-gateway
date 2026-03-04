@@ -15,8 +15,6 @@ spring:
         service-name: ${spring.application.name}
         instance-id: ${spring.application.name}:${random.value}
         prefer-ip-address: true
-        health-check-path: /actuator/health
-        health-check-interval: 10s
       config:
         enabled: false  # Disable Consul Config
 
@@ -32,7 +30,7 @@ spring:
           predicates:
             - Path=/api/platform/public/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             is-public: true
 
@@ -41,7 +39,7 @@ spring:
           predicates:
             - Path=/api/platform/auth/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             is-public: true
 
@@ -60,7 +58,7 @@ spring:
           predicates:
             - Path=/api/platform/v3/api-docs/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             is-public: true
 
@@ -69,7 +67,7 @@ spring:
           predicates:
             - Path=/api/booking/v3/api-docs/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             is-public: true
 
@@ -79,7 +77,7 @@ spring:
           predicates:
             - Path=/api/platform/actuator/health
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             is-public: true
 
@@ -88,7 +86,7 @@ spring:
           predicates:
             - Path=/api/booking/actuator/health
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             is-public: true
 
@@ -101,7 +99,7 @@ spring:
           predicates:
             - Path=/api/platform/admin/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
@@ -110,7 +108,7 @@ spring:
           predicates:
             - Path=/api/platform/user/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
@@ -119,7 +117,7 @@ spring:
           predicates:
             - Path=/api/platform/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
@@ -128,7 +126,7 @@ spring:
           predicates:
             - Path=/api/booking/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
@@ -137,7 +135,7 @@ spring:
           predicates:
             - Path=/api/platform/actuator/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
@@ -146,7 +144,7 @@ spring:
           predicates:
             - Path=/api/booking/actuator/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
           metadata:
             requires-auth: true
 
@@ -163,16 +161,6 @@ jwt:
 # ===============================
 # MANAGEMENT / ACTUATOR
 # ===============================
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
-
 
 # ===============================
 # LOGGING
