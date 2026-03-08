@@ -71,6 +71,15 @@ spring:
           metadata:
             is-public: true
 
+        - id: payment-api-docs
+          uri: lb://MOMENT-FOREVER-PAYMENT
+          predicates:
+            - Path=/api/payment/v3/api-docs/**
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
         # Health Checks (public, no auth)
         - id: platform-actuator-health
           uri: lb://MOMENT-FOREVER-PLATFORM
@@ -85,6 +94,15 @@ spring:
           uri: lb://MOMENT-FOREVER-BOOKING
           predicates:
             - Path=/api/booking/actuator/health
+          filters:
+            - StripPrefix=1
+          metadata:
+            is-public: true
+
+        - id: payment-actuator-health
+          uri: lb://MOMENT-FOREVER-PAYMENT
+          predicates:
+            - Path=/api/payment/actuator/health
           filters:
             - StripPrefix=1
           metadata:
@@ -130,6 +148,15 @@ spring:
           metadata:
             requires-auth: true
 
+        - id: payment-service
+          uri: lb://MOMENT-FOREVER-PAYMENT
+          predicates:
+            - Path=/api/payment/**
+          filters:
+            - StripPrefix=1
+          metadata:
+            requires-auth: true
+
         - id: platform-actuator
           uri: lb://MOMENT-FOREVER-PLATFORM
           predicates:
@@ -143,6 +170,15 @@ spring:
           uri: lb://MOMENT-FOREVER-BOOKING
           predicates:
             - Path=/api/booking/actuator/**
+          filters:
+            - StripPrefix=1
+          metadata:
+            requires-auth: true
+
+        - id: payment-actuator
+          uri: lb://MOMENT-FOREVER-PAYMENT
+          predicates:
+            - Path=/api/payment/actuator/**
           filters:
             - StripPrefix=1
           metadata:
@@ -184,3 +220,5 @@ springdoc:
         url: /api/platform/v3/api-docs
       - name: Booking Service
         url: /api/booking/v3/api-docs
+      - name: Payment Service
+        url: /api/payment/v3/api-docs
