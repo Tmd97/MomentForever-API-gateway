@@ -15,8 +15,16 @@ spring:
         service-name: ${spring.application.name}
         instance-id: ${spring.application.name}:${random.value}
         prefer-ip-address: true
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        deregister-after: 1m
+        query-passing: true
       config:
         enabled: false  # Disable Consul Config
+
+    loadbalancer:
+      cache:
+        ttl: 5s
 
     gateway:
       routes:
@@ -202,10 +210,7 @@ jwt:
 # LOGGING
 # ===============================
 
-logging:
-  level:
-    com.example.gateway: DEBUG
-    org.springframework.cloud.gateway: INFO
+#moved to logback.xml file
 
 
 # ===============================
